@@ -257,6 +257,7 @@
             Controls.Add(listView1);
             Controls.Add(sid_textBox);
             Controls.Add(label1);
+            MaximizeBox = false;
             Name = "Form1";
             Text = "SUPER NUMBER";
             ResumeLayout(false);

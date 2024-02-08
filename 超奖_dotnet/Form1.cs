@@ -20,9 +20,10 @@ namespace 超奖_dotnet
             InitializeComponent();
         }
 
-        private async void button2_Click(object sender, EventArgs e)
+        private void button2_Click(object sender, EventArgs e)
         {
             timer1.Enabled = true;
+            timer1_Tick(this, EventArgs.Empty);
         }
 
         async Task<bool> UpdateList1()
