@@ -14,6 +14,9 @@ namespace 超奖_dotnet
     {
         int amountEachBet = 10;
         int numOfBetOn = 0;
+        int up = 0;
+        int down = 0;
+        Random seed = new Random();
         Api? api;
         public Form1()
         {
@@ -21,7 +24,7 @@ namespace 超奖_dotnet
         }
 
         private void button2_Click(object sender, EventArgs e)
-        {
+        {// 开始运行
             timer1.Enabled = true;
             timer1_Tick(this, EventArgs.Empty);
         }
@@ -36,14 +39,14 @@ namespace 超奖_dotnet
                 if (!resp.status)
                 {
                     timer1.Enabled = false;
-                    MessageBox.Show($"获取开奖信息失败，状态码：{resp.code}");
+                    MessageBox.Show($"获取开奖信息失败，状态码：{resp.code}，重新登录获取新的SID试试");
                     return false;
                 }
 
                 if (resp.data.Count == 0)
                 {
                     timer1.Enabled = false;
-                    MessageBox.Show("服务器返回的开奖信息为空！");
+                    MessageBox.Show("服务器返回的开奖信息为空！等到今日第一次下注之后再运行程序试试");
                     return false;
                 }
                 resp.data.ForEach(x =>
@@ -81,7 +84,7 @@ namespace 超奖_dotnet
             if (!resp.status)
             {
                 timer1.Enabled = false;
-                MessageBox.Show($"下注失败，状态码：{resp.code}");
+                MessageBox.Show($"下注失败，状态码：{resp.code}，可能是重复下注了，或者是SID失效");
                 return;
             }
 
@@ -130,17 +133,32 @@ namespace 超奖_dotnet
 
         }
 
-        private async void timer1_Tick(object sender, EventArgs e)
-        {
+        static bool checkTime()
+        {// 检查封盘
+            //// 23:54 - 07:07 封盘
+            //if ((DateTime.Now.Hour <= 7 && DateTime.Now.Minute < 7) && (DateTime.Now.Hour >= 23 && DateTime.Now.Minute > 54))
+            //{
+            //    return false;
+            //}
 
-            if (DateTime.Now.Hour < 7 || (DateTime.Now.Hour >= 23 && DateTime.Now.Minute > 55))
+
+            // 0:00 - 07:07 封盘
+            if ((DateTime.Now.Hour <= 7 && DateTime.Now.Minute < 7) && (DateTime.Now.Hour >= 0 && DateTime.Now.Minute > 0))
             {
-                return;
+                return false;
             }
+            return true;
+        }
+
+        private async void timer1_Tick(object sender, EventArgs e)
+        {// 每分钟运行一次
+
+            // 封盘时直接返回
+            if (!checkTime()) { return; }
 
             api = new Api(sid_textBox.Text); // 更新sid
 
-            // 更新每注金额
+            // 检查每注金额
             try
             {
                 amountEachBet = int.Parse(betAmount_textBox.Text);
@@ -152,43 +170,85 @@ namespace 超奖_dotnet
                 return;
             }
 
+            // 检查上下限
+            try
+            {
+                up = int.Parse(textBox1.Text);
+                down = int.Parse(textBox2.Text);
+            }
+            catch
+            {
+                timer1.Enabled = false;
+                MessageBox.Show("请输入正确的上下限，仅限数字");
+                return;
+            }
+
 
             if (!await UpdateList1()) { return; }
             UpdateList2();
             alreadyBet_textBox.Text = numOfBetOn.ToString();
 
             // 检查是否达到限制
-            if (numOfBetOn >= 3 || numOfBetOn <= -6)
+            if ((numOfBetOn >= up || numOfBetOn <= down))
             {
                 timer1.Enabled = false;
                 MessageBox.Show("已中注数达到限制，停止运行");
                 return;
             }
-            Bet();
+
+            if (listView2.Items.Count > 0 && listView2.Items[0].SubItems.Count < 3)
+            {// 确保知道结果后再下注
+                return;
+            }
+
+
+            new Thread(() =>
+            {
+                Thread.Sleep(1000 * seed.Next(30)); // 下注前随机休眠
+                // Bet(); // 非UI线程不可直接操控UI
+                Invoke(delegate { Bet(); });
+            }).Start();
         }
 
         private void timer2_Tick(object sender, EventArgs e)
-        {
+        {// 更新运行状态
+
             if (timer1.Enabled)
             {
                 label6.Text = "程序运行中";
                 label6.ForeColor = Color.Green;
-                if (DateTime.Now.Hour < 7 || (DateTime.Now.Hour >= 23 && DateTime.Now.Minute > 55))
+                if (!checkTime())
                 {
                     label6.Text = "封盘中……";
                     label6.ForeColor = Color.YellowGreen;
                 }
+                button4.Enabled = false;
             }
             else
             {
+                button4.Enabled = true;
                 label6.Text = "程序未运行";
                 label6.ForeColor = Color.Black;
             }
         }
 
         private void button3_Click(object sender, EventArgs e)
-        {
+        {// 停止运行
+
             timer1.Enabled = false;
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            
+            numOfBetOn = 0;
+            alreadyBet_textBox.Text = "0";
+            listView2.Items.Clear();
         }
     }
 }

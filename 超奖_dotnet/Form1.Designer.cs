@@ -30,8 +30,6 @@
         {
             components = new System.ComponentModel.Container();
             ListViewItem listViewItem1 = new ListViewItem(new ListViewItem.ListViewSubItem[] { new ListViewItem.ListViewSubItem(null, "113007916", Color.Black, SystemColors.Window, new Font("Microsoft YaHei UI", 9F)), new ListViewItem.ListViewSubItem(null, "2024-02-08 23:50"), new ListViewItem.ListViewSubItem(null, "[20]", Color.Red, SystemColors.Window, new Font("Microsoft YaHei UI", 9F)) }, -1);
-            ListViewItem listViewItem2 = new ListViewItem(new string[] { "113007917", "已下单Odd，10元" }, -1);
-            ListViewItem listViewItem3 = new ListViewItem(new string[] { "113007916", "已下单Even，10元" }, -1);
             label1 = new Label();
             sid_textBox = new TextBox();
             listView1 = new ListView();
@@ -54,6 +52,11 @@
             timer2 = new System.Windows.Forms.Timer(components);
             label6 = new Label();
             button3 = new Button();
+            label7 = new Label();
+            label8 = new Label();
+            textBox1 = new TextBox();
+            textBox2 = new TextBox();
+            button4 = new Button();
             SuspendLayout();
             // 
             // label1
@@ -137,9 +140,6 @@
             listView2.Columns.AddRange(new ColumnHeader[] { columnHeader4, columnHeader5, columnHeader6 });
             listView2.FullRowSelect = true;
             listView2.GridLines = true;
-            listViewItem2.UseItemStyleForSubItems = false;
-            listViewItem3.UseItemStyleForSubItems = false;
-            listView2.Items.AddRange(new ListViewItem[] { listViewItem2, listViewItem3 });
             listView2.Location = new Point(499, 69);
             listView2.Name = "listView2";
             listView2.Size = new Size(292, 377);
@@ -173,7 +173,7 @@
             // 
             // button2
             // 
-            button2.Location = new Point(387, 188);
+            button2.Location = new Point(387, 316);
             button2.Name = "button2";
             button2.Size = new Size(94, 29);
             button2.TabIndex = 8;
@@ -230,7 +230,7 @@
             // 
             // button3
             // 
-            button3.Location = new Point(387, 237);
+            button3.Location = new Point(387, 365);
             button3.Name = "button3";
             button3.Size = new Size(94, 29);
             button3.TabIndex = 13;
@@ -238,11 +238,62 @@
             button3.UseVisualStyleBackColor = true;
             button3.Click += button3_Click;
             // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new Point(387, 176);
+            label7.Name = "label7";
+            label7.Size = new Size(54, 20);
+            label7.TabIndex = 14;
+            label7.Text = "上限：";
+            // 
+            // label8
+            // 
+            label8.AutoSize = true;
+            label8.Location = new Point(387, 220);
+            label8.Name = "label8";
+            label8.Size = new Size(54, 20);
+            label8.TabIndex = 15;
+            label8.Text = "下限：";
+            // 
+            // textBox1
+            // 
+            textBox1.Location = new Point(432, 173);
+            textBox1.Name = "textBox1";
+            textBox1.Size = new Size(49, 27);
+            textBox1.TabIndex = 16;
+            textBox1.Text = "3";
+            textBox1.TextAlign = HorizontalAlignment.Right;
+            // 
+            // textBox2
+            // 
+            textBox2.Location = new Point(432, 217);
+            textBox2.Name = "textBox2";
+            textBox2.Size = new Size(49, 27);
+            textBox2.TabIndex = 17;
+            textBox2.Text = "-6";
+            textBox2.TextAlign = HorizontalAlignment.Right;
+            // 
+            // button4
+            // 
+            button4.Location = new Point(387, 267);
+            button4.Name = "button4";
+            button4.Size = new Size(94, 29);
+            button4.TabIndex = 18;
+            button4.Text = "清空已下注";
+            button4.UseVisualStyleBackColor = true;
+            button4.Click += button4_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(9F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(796, 450);
+            Controls.Add(button4);
+            Controls.Add(textBox2);
+            Controls.Add(textBox1);
+            Controls.Add(label8);
+            Controls.Add(label7);
             Controls.Add(button3);
             Controls.Add(label6);
             Controls.Add(label5);
@@ -260,6 +311,7 @@
             MaximizeBox = false;
             Name = "Form1";
             Text = "SUPER NUMBER";
+            Load += Form1_Load;
             ResumeLayout(false);
             PerformLayout();
         }
@@ -288,5 +340,10 @@
         private System.Windows.Forms.Timer timer2;
         private Label label6;
         private Button button3;
+        private Label label7;
+        private Label label8;
+        private TextBox textBox1;
+        private TextBox textBox2;
+        private Button button4;
     }
 }
