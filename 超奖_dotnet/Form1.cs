@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+
 namespace 超奖_dotnet
 {
     public partial class Form1 : Form
@@ -45,8 +46,8 @@ namespace 超奖_dotnet
 
                 if (resp.data.Count == 0)
                 {
-                    timer1.Enabled = false;
-                    MessageBox.Show("服务器返回的开奖信息为空！等到今日第一次下注之后再运行程序试试");
+                    //timer1.Enabled = false;
+                    //MessageBox.Show("服务器返回的开奖信息为空！等到今日第一次下注之后再运行程序试试");
                     return false;
                 }
                 resp.data.ForEach(x =>
@@ -60,10 +61,10 @@ namespace 超奖_dotnet
                 });
                 return true;
             }
-            catch
+            catch(Exception e)
             {
-                timer1.Enabled = false;
-                MessageBox.Show("获取开奖信息失败，疑似网络问题");
+                //timer1.Enabled = false;
+                MessageBox.Show($"{DateTime.Now}，获取开奖信息失败，{e.Message}");
                 return false;
             }
         }
@@ -83,8 +84,8 @@ namespace 超奖_dotnet
             var resp = await api.Order(issue, orderType, amountEachBet);
             if (!resp.status)
             {
-                timer1.Enabled = false;
-                MessageBox.Show($"下注失败，状态码：{resp.code}，可能是重复下注了，或者是SID失效");
+                //timer1.Enabled = false;
+                //MessageBox.Show($"下注失败，状态码：{resp.code}，可能是重复下注了，或者是SID失效");
                 return;
             }
 
@@ -143,7 +144,7 @@ namespace 超奖_dotnet
 
 
             // 0:00 - 07:07 封盘
-            if ((DateTime.Now.Hour <= 7 && DateTime.Now.Minute < 7) && (DateTime.Now.Hour >= 0 && DateTime.Now.Minute > 0))
+            if ((DateTime.Now.Hour >=0 && DateTime.Now.Hour < 7) || (DateTime.Now.Hour == 7 && DateTime.Now.Minute < 7))
             {
                 return false;
             }
@@ -223,10 +224,12 @@ namespace 超奖_dotnet
                     label6.ForeColor = Color.YellowGreen;
                 }
                 button4.Enabled = false;
+                button2.Enabled = false;
             }
             else
             {
                 button4.Enabled = true;
+                button2.Enabled = true;
                 label6.Text = "程序未运行";
                 label6.ForeColor = Color.Black;
             }
@@ -244,7 +247,7 @@ namespace 超奖_dotnet
         }
 
         private void button4_Click(object sender, EventArgs e)
-        {
+        {//清空已下注
             
             numOfBetOn = 0;
             alreadyBet_textBox.Text = "0";
