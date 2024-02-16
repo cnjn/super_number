@@ -1,9 +1,11 @@
 ﻿using Flurl.Http;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 
@@ -14,7 +16,7 @@ namespace 超奖_dotnet
     public record Data(string open_at, string? superNumber, string issue);
     public record Resp(List<Data> data, bool status, int? code);
     public enum OrderType { Odd, Even};
-    internal class Api(string sid)
+    internal partial class Api(string sid)
     {
         /// <summary>
         /// 获取最新的开奖结果
@@ -97,5 +99,37 @@ namespace 超奖_dotnet
             return resp;
 
         }
+
+        /// <summary>
+        /// 返回最新的游戏期号，成功返回数字，失败返回0
+        /// </summary>
+        /// <returns></returns>
+        public async Task<int> GetLatestIssue()
+        {
+             
+            var resp = await "https://fa268.net/bet/?c=231"
+                .PostJsonAsync(new
+                {
+                    c = 231,
+                    data = new
+                    {
+                        sid,
+                        typeId = new[] {"120"}
+                    }
+                })
+                .ReceiveString();
+            try
+            {
+                var issue = SearchIssue().Match(resp).Groups[1].Value;
+                return int.Parse(issue);
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        [GeneratedRegex("""issue":"(\d+)""")]
+        private static partial Regex SearchIssue();
     }
 }

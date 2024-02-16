@@ -14,12 +14,13 @@ namespace 超奖_dotnet
         static void Main()
         {
             // 设置代理
-            //FlurlHttp.Clients.WithDefaults(builder => builder
-            //.ConfigureHttpClient(hc => { })
-            //.ConfigureInnerHandler(hch => {
-            //    hch.Proxy = new WebProxy("http://127.0.0.1:8888");
-            //    hch.UseProxy = true;
-            //}));
+            FlurlHttp.Clients.WithDefaults(builder => builder
+            .ConfigureHttpClient(hc => { })
+            .ConfigureInnerHandler(hch =>
+            {
+                hch.Proxy = new WebProxy("http://172.28.90.45:808");
+                hch.UseProxy = true;
+            }));
 
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.

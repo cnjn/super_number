@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -48,7 +49,7 @@ namespace 超奖_dotnet
                 {
                     //timer1.Enabled = false;
                     //MessageBox.Show("服务器返回的开奖信息为空！等到今日第一次下注之后再运行程序试试");
-                    return false;
+                    //return false;
                 }
                 resp.data.ForEach(x =>
                 {
@@ -61,22 +62,32 @@ namespace 超奖_dotnet
                 });
                 return true;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 //timer1.Enabled = false;
                 MessageBox.Show($"{DateTime.Now}，获取开奖信息失败，{e.Message}");
-                return false;
+                return true;
             }
         }
 
         async void Bet()
         {
-            var issue = int.Parse(listView1.Items[0].Text) + 1;
+            if(api ==  null) { return; }
+            var issue = await api.GetLatestIssue();
+            if (issue == 0)
+            {
+                MessageBox.Show("获取最新期号失败");
+                return;
+            }
             // 已下注则不再重复下注
             if (listView2.Items.Count != 0 && listView2.Items[0].Text == issue.ToString()) { return; }
 
             var map = new[] { "00", "05", "15", "20", "30", "35", "45", "50" };
-            var lastTime = listView1.Items[0].SubItems[1].Text.Split(":")[1];
+            var lastTime = "55";
+            if(listView1.Items.Count > 0)
+            {
+                lastTime = listView1.Items[0].SubItems[1].Text.Split(":")[1];
+            }
 
             var orderType = OrderType.Odd;
             if (Array.IndexOf(map, lastTime) == -1) { orderType = OrderType.Even; }
@@ -85,7 +96,7 @@ namespace 超奖_dotnet
             if (!resp.status)
             {
                 //timer1.Enabled = false;
-                //MessageBox.Show($"下注失败，状态码：{resp.code}，可能是重复下注了，或者是SID失效");
+                MessageBox.Show($"下注失败，状态码：{resp.code}，可能是重复下注了，或者是SID失效");
                 return;
             }
 
@@ -143,8 +154,8 @@ namespace 超奖_dotnet
             //}
 
 
-            // 0:00 - 07:07 封盘
-            if ((DateTime.Now.Hour >=0 && DateTime.Now.Hour < 7) || (DateTime.Now.Hour == 7 && DateTime.Now.Minute < 7))
+            // 0:00 - 07:01 封盘
+            if ((DateTime.Now.Hour >= 0 && DateTime.Now.Hour < 7) || (DateTime.Now.Hour == 7 && DateTime.Now.Minute < 1))
             {
                 return false;
             }
@@ -248,10 +259,16 @@ namespace 超奖_dotnet
 
         private void button4_Click(object sender, EventArgs e)
         {//清空已下注
-            
+
             numOfBetOn = 0;
             alreadyBet_textBox.Text = "0";
             listView2.Items.Clear();
+        }
+
+        private async void button1_Click(object sender, EventArgs e)
+        {
+            api = new Api(sid_textBox.Text);
+            Debug.WriteLine(await api.GetLatestIssue());
         }
     }
 }
